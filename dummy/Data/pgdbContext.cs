@@ -9,6 +9,7 @@ namespace dummy.Data
         {
 
         }
+
         public DbSet<User> users { get; set; }
         public DbSet<Shift> shifts { get; set; }
     }

@@ -53,21 +53,39 @@ namespace dummy.Models
     {
         public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            return DateTime.ParseExact(reader.GetString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+            string dateString = reader.GetString();
+
+            // Parse the ISO 8601 formatted string
+            if (!DateTime.TryParseExact(dateString, "yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out DateTime result))
+            {
+                throw new JsonException($"Invalid DateTime format: {dateString}. Expected format: yyyy-MM-ddTHH:mm:ss.fffZ");
+            }
+
+            return result;
         }
 
         public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
         {
-            writer.WriteStringValue(value.ToString("yyyy-MM-dd HH:mm:ss"));
+            writer.WriteStringValue(value.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
         }
     }
 
     public class FutureAttribute : ValidationAttribute
     {
-        public override bool IsValid(object value)
+      protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            DateTime dt = (DateTime)value;
-            return dt > DateTime.Now;
+            if (value is DateTime dt)
+            {
+                if (dt.ToUniversalTime() >= DateTime.UtcNow)
+                {
+                    return ValidationResult.Success;
+                }
+                else
+                {
+                    return new ValidationResult(ErrorMessage ?? "The date must be in the future.");
+                }
+            }
+            return new ValidationResult("Invalid DateTime format.");
         }
     }
 
