@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using dummy.Data;
@@ -11,9 +12,11 @@ using dummy.Data;
 namespace dummy.Migrations
 {
     [DbContext(typeof(pgdbContext))]
-    partial class pgdbContextModelSnapshot : ModelSnapshot
+    [Migration("20240422082549_AddUserTableToDB")]
+    partial class AddUserTableToDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
